@@ -1,5 +1,5 @@
 # Deployment & Integration Guide
-## Nutrition Claim Verifier — Frontend & Backend Integration
+## Nutrition Claim Verifier — Full Stack Application Guide
 
 ---
 
@@ -9,14 +9,15 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                    NEXT.JS VERCEL FRONTEND                      │
 │             nutrition-claim-verifier-ui.vercel.app              │
-│   (Dashboard, Verify Product, OCR Upload, Dataset Explorer)     │
+│   (Standalone /login, Dashboard, Verify, Results, Dataset)      │
+│   Source code located in: /frontend                             │
 └────────────────────────────────┬────────────────────────────────┘
-                                 │ REST API (JSON)
+                                 │ REST API (JSON / Multipart)
                                  │ NEXT_PUBLIC_API_URL
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FASTAPI BACKEND (api.py)                     │
-│               Hosted on Render / Railway / Local                │
+│        Hosted on Render: nutrition-claim-verifier-api           │
 ├─────────────────────────────────────────────────────────────────┤
 │ • GET  /api/health      • GET  /api/stats    • GET  /api/claims │
 │ • GET  /api/dataset     • POST /api/verify   • POST /api/ocr    │
@@ -36,82 +37,70 @@
 
 ---
 
-## 2. Running Locally
+## 2. Deploying the Updated Frontend on Vercel
 
-### Prerequisites
-- Python 3.12 (`.venv` already configured in workspace)
-- Groq API Key (already configured in `.streamlit/secrets.toml`)
-
-### A. Run the Full Streamlit App (Frontend + Backend in One)
-```powershell
-cd c:\Users\ganes\OneDrive\Desktop\arpita\nutrition-claim-verifier
-.venv\Scripts\streamlit run app.py
-```
-Open `http://localhost:8501` in your browser. This includes:
-- **📈 Dashboard**: Live analytics, compliance percentages, category chart, recent audited products
-- **📦 Verify Product**: Check any of the 25 curated products against official FSSAI thresholds
-- **📷 Check Label Photo (OCR)**: Upload food packaging photo for automatic text and nutrition extraction
-- **📊 Dataset Explorer**: Interactive search, filtering by category/compliance, and CSV download
-- **🔐 User Session & Auth**: Academic Auditor vs. Guest Consumer role switcher in the sidebar
-
-### B. Run the FastAPI REST Backend
-```powershell
-cd c:\Users\ganes\OneDrive\Desktop\arpita\nutrition-claim-verifier
-.venv\Scripts\uvicorn api:app --reload --port 8000
-```
-- Interactive API Documentation: `http://localhost:8000/docs`
-- Health check: `http://localhost:8000/api/health`
-- Dataset endpoint: `http://localhost:8000/api/dataset`
-- Stats endpoint: `http://localhost:8000/api/stats`
-
----
-
-## 3. Connecting the Vercel Frontend to the Backend
-
-The Vercel deployment at `https://nutrition-claim-verifier-ui.vercel.app` is currently rendering static mockup UI components. To connect it to the real Python backend:
-
-### Step 1: Deploy `api.py` to Render / Railway (Free)
-
-#### Repository already pushed and available at:
+The full Next.js App Router frontend source code is committed in the `/frontend` directory of:
 `https://github.com/bodasrisaiganeshan/nutrition-claim-verifier`
 
-#### Deploying on Render (Free Web Service):
-1. In [Render Dashboard](https://dashboard.render.com), click **New +** -> **Web Service**.
-2. Connect your repository: `bodasrisaiganeshan/nutrition-claim-verifier`.
-3. Set:
-   - **Environment / Runtime**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
-4. Under **Environment Variables**, configure:
-   - `PYTHON_VERSION`: `3.12.8` *(enforced via committed `.python-version` and `render.yaml`; also recommended to set explicitly in Render dashboard)*
-   - `GROQ_API_KEY`: *(paste your real Groq key from `.streamlit/secrets.toml`)*
-   - `GROQ_MODEL`: `openai/gpt-oss-120b`
-5. Click **Create Web Service**. Your public URL will be:
-   `https://nutrition-claim-verifier-api.onrender.com`
+### Deploy via Vercel Dashboard (Recommended)
+
+1. Open your [Vercel Dashboard](https://vercel.com/dashboard).
+2. Open the project **`nutrition-claim-verifier-ui`** (or import `bodasrisaiganeshan/nutrition-claim-verifier` as a new project).
+3. Under **Settings** -> **General**:
+   - Set **Root Directory** to: `frontend`
+   - Framework Preset: **Next.js**
+   - Build Command: `next build`
+   - Output Directory: `.next`
+4. Under **Settings** -> **Environment Variables**:
+   - `NEXT_PUBLIC_API_URL` = `https://nutrition-claim-verifier-api.onrender.com`
+5. Click **Deploy / Redeploy**.
 
 ---
 
-### Step 2: Set Environment Variable in Vercel
+## 3. Live Deployment Status & Health Checks
 
-1. Go to your [Vercel Dashboard](https://vercel.com/dashboard).
-2. Select the `nutrition-claim-verifier-ui` project.
-3. Navigate to **Settings** -> **Environment Variables**.
-4. Add a new variable:
-   - **Key**: `NEXT_PUBLIC_API_URL`
-   - **Value**: `https://nutrition-claim-verifier-api.onrender.com` (or your local backend tunnel like `https://xxx.ngrok-free.app` during testing)
-5. Redeploy the latest commit on Vercel.
+| Component | Target URL | Health Status |
+|-----------|------------|---------------|
+| **Backend API (Render)** | `https://nutrition-claim-verifier-api.onrender.com` | ✅ Live (200 OK) |
+| **Backend Health Check** | `https://nutrition-claim-verifier-api.onrender.com/api/health` | ✅ Live (25 products, 9 claims) |
+| **Backend Stats API** | `https://nutrition-claim-verifier-api.onrender.com/api/stats` | ✅ Live (84% compliant, 16% non-compliant) |
+| **Frontend UI (Vercel)** | `https://nutrition-claim-verifier-ui.vercel.app` | Updated Next.js application |
+| **GitHub Repository** | `https://github.com/bodasrisaiganeshan/nutrition-claim-verifier` | Production master branch |
 
 ---
 
-## 4. API Endpoints Specification
+## 4. Authentication & Session Architecture
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/health` | Backend status, dataset size & rule counts |
-| `GET` | `/api/stats` | Dynamic dashboard stats (total products, compliance %, category breakdown) |
-| `GET` | `/api/claims` | Supported claim types for selection dropdowns |
-| `GET` | `/api/dataset` | Full 25-product catalogue with search & filter params |
-| `POST` | `/api/verify` | Runs rule engine, calculates misleading risk, generates Groq explanation |
-| `POST` | `/api/ocr` | Accepts label photo, runs RapidOCR/PaddleOCR, extracts nutrients & ingredients |
-| `GET` | `/api/similar` | Finds similar products in dataset by claim type & category |
+### Standalone Sign-In Landing Page (`/login`)
+- Replaced the intrusive popup dialog with a dedicated, professional landing page.
+- Branding correctly updated to **Nutrition Claim Verifier** (removed legacy "LabelCheck" branding).
+- Two operational modes:
+  1. **Auditor Sign In**: Validates institutional credentials and creates a persistent session token.
+  2. **Request Research Access**: Allows academic auditors, consumer advocates, and brand compliance officers to register their research use case and instantly receive a session token.
+- Preconfigured Demo Auditor profiles available with one click:
+  - Lead Auditor: `auditor@fssai-audit.ac.in` / `audit2026`
+  - Consumer Advocate: `consumer@safefood.org` / `consumer2026`
+  - Food Brand Compliance: `regulatory@compliance.in` / `fssai2026`
+- **Route Guard**: The `AuthGuard` component intercepts unauthenticated visits to `/`, `/verify`, `/results`, and `/dataset`, redirecting immediately to `/login`.
+- **Sign-Out Flow**: The sidebar and top navigation include an explicit "Sign Out" button that clears session tokens and returns the user to `/login`.
 
+---
+
+## 5. End-to-End Verification Flow
+
+1. **User enters product name and selects/types a front-of-pack claim** (e.g. Lay's potato chips, "No Added Sugar").
+2. **User uploads back-of-pack label photo** (optional):
+   - "Run OCR" calls `POST /api/ocr` on the Render backend.
+   - RapidOCR/PaddleOCR extracts ingredients and declared nutrients.
+   - Values auto-populate into editable input fields.
+3. **User clicks "Verify Claim against FSSAI Rules"**:
+   - `POST /api/verify` executes the deterministic rule engine.
+   - Evaluates mandatory thresholds, hidden sweetener keywords, and positive/negative nutrient ratios.
+   - Identifies similar products from the 25-product Indian FMCG benchmark dataset.
+   - Generates plain-language explanation (Groq AI `openai/gpt-oss-120b` or deterministic template fallback).
+   - AI is strictly prohibited from altering the rule engine's legal verdict.
+4. **Results Page (`/results`)**:
+   - Displays real user-submitted product name and claim (eliminates static "Baked Ragi Chips" mock).
+   - Dual Verdict banner: Legal compliance + Consumer misleading risk level.
+   - Nutrient comparison table and detected ingredient flags.
+   - Export audit report as JSON or print summary.
