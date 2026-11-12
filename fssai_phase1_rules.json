@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "version": "2026-11-phase1",
+    "description": "Machine-readable FSSAI Phase-1 claim rules for the URE Nutrition Claim Verifier.",
+    "decision_basis": "Fixed thresholds per 100 g (solids) or per 100 ml (liquids). Deterministic and easy to defend.",
+    "rda_reference": {
+      "protein_g_per_day": 50.0,
+      "fibre_g_per_day": 25.0,
+      "note": "ICMR-NIN adult reference. Used ONLY for informational %RDA text, not for pass/fail in Phase-1."
+    },
+    "default_form": "solid",
+    "form_note": "If the panel is declared per serving (not per 100 g/ml), the engine adds a warning and asks the user to verify."
+  },
+
+  "claims": [
+    {
+      "canonical": "high_protein",
+      "display_name": "High Protein",
+      "aliases": ["high protein", "rich in protein", "high in protein", "protein rich"],
+      "type": "numeric",
+      "nutrient": "protein_g",
+      "comparator": ">=",
+      "thresholds": { "solid": 10.0, "liquid": 5.0 },
+      "unit": "g per 100 g / 100 ml",
+      "rule_id": "FSSAI-2.2.7-HP",
+      "pass_text": "Protein meets the High Protein threshold (>= 20% of RDA).",
+      "fail_text": "Protein is below the High Protein threshold (>= 20% of RDA)."
+    },
+    {
+      "canonical": "source_of_protein",
+      "display_name": "Source of Protein",
+      "aliases": ["source of protein", "contains protein", "protein source"],
+      "type": "numeric",
+      "nutrient": "protein_g",
+      "comparator": ">=",
+      "thresholds": { "solid": 5.0, "liquid": 2.5 },
+      "unit": "g per 100 g / 100 ml",
+      "rule_id": "FSSAI-2.2.7-SP",
+      "pass_text": "Protein meets the Source of Protein threshold (>= 10% of RDA).",
+      "fail_text": "Protein is below the Source of Protein threshold (>= 10% of RDA)."
+    },
+    {
+      "canonical": "sugar_free",
+      "display_name": "Sugar Free",
+      "aliases": ["sugar free", "sugars free", "zero sugar", "0 sugar", "no sugar"],
+      "type": "numeric",
+      "nutrient": "total_sugars_g",
+      "comparator": "<=",
+      "thresholds": { "solid": 0.5, "liquid": 0.5 },
+      "unit": "g per 100 g / 100 ml",
+      "rule_id": "FSSAI-2.2.7-SF",
+      "pass_text": "Total sugars are within the Sugar Free limit (<= 0.5 g).",
+      "fail_text": "Total sugars exceed the Sugar Free limit (<= 0.5 g)."
+    },
+    {
+      "canonical": "low_sugar",
+      "display_name": "Low Sugar",
+      "aliases": ["low sugar", "low in sugar", "reduced sugar"],
+      "type": "numeric",
+      "nutrient": "total_sugars_g",
+      "comparator": "<=",
+      "thresholds": { "solid": 5.0, "liquid": 2.5 },
+      "unit": "g per 100 g / 100 ml",
+      "rule_id": "FSSAI-2.2.7-LS",
+      "pass_text": "Total sugars are within the Low Sugar limit.",
+      "fail_text": "Total sugars exceed the Low Sugar limit."
+    },
+    {
+      "canonical": "no_added_sugar",
+      "display_name": "No Added Sugar",
+      "aliases": [
+        "no added sugar", "without added sugar", "zero added sugar",
+        "0% added sugar", "no added sugars", "0 added sugar"
+      ],
+      "type": "ingredient_sensitive",
+      "nutrient": "added_sugars_g",
+      "comparator": "<=",
+      "thresholds": { "solid": 0.5, "liquid": 0.5 },
+      "unit": "g added sugars per 100 g / 100 ml",
+      "hard_deny_list": ["glucose syrup", "liquid glucose", "invert sugar", "invert syrup", "corn syrup", "cane sugar", "sucrose"],
+      "soft_deny_list": ["apple juice concentrate", "fruit juice concentrate", "fruit concentrate", "fructose", "honey", "jaggery", "molasses", "malt extract", "maltodextrin", "maltitol", "dextrose", "date paste", "raisin", "dried fruit", "sorbitol"],
+      "requires_disclaimer": "CONTAINS NATURALLY OCCURRING SUGARS",
+      "rule_id": "FSSAI-2.2.7-NAS",
+      "pass_text": "No added sugar ingredients detected and added-sugar value is within limit.",
+      "fail_text": "An added-sugar ingredient was detected although the claim says 'No Added Sugar'.",
+      "deceptive_note": "Numeric value may pass, but a sugar substitute / hidden sugar ingredient is present."
+    },
+    {
+      "canonical": "high_fibre",
+      "display_name": "High Fibre",
+      "aliases": ["high fibre", "high fiber", "rich in fibre", "rich in fiber"],
+      "type": "numeric",
+      "nutrient": "dietary_fibre_g",
+      "comparator": ">=",
+      "thresholds": { "solid": 6.0, "liquid": 3.0 },
+      "unit": "g per 100 g / 100 ml",
+      "rule_id": "FSSAI-2.2.7-HF",
+      "pass_text": "Dietary fibre meets the High Fibre threshold.",
+      "fail_text": "Dietary fibre is below the High Fibre threshold."
+    },
+    {
+      "canonical": "source_of_fibre",
+      "display_name": "Source of Fibre",
+      "aliases": ["source of fibre", "source of fiber", "contains fibre", "contains fiber"],
+      "type": "numeric",
+      "nutrient": "dietary_fibre_g",
+      "comparator": ">=",
+      "thresholds": { "solid": 3.0, "liquid": 1.5 },
+      "unit": "g per 100 g / 100 ml",
+      "rule_id": "FSSAI-2.2.7-SF2",
+      "pass_text": "Dietary fibre meets the Source of Fibre threshold.",
+      "fail_text": "Dietary fibre is below the Source of Fibre threshold."
+    },
+    {
+      "canonical": "low_fat",
+      "display_name": "Low Fat",
+      "aliases": ["low fat", "low in fat", "reduced fat"],
+      "type": "numeric",
+      "nutrient": "total_fat_g",
+      "comparator": "<=",
+      "thresholds": { "solid": 3.0, "liquid": 1.5 },
+      "unit": "g per 100 g / 100 ml",
+      "rule_id": "FSSAI-2.2.7-LF",
+      "pass_text": "Total fat is within the Low Fat limit.",
+      "fail_text": "Total fat exceeds the Low Fat limit."
+    },
+    {
+      "canonical": "percent_wholegrain",
+      "display_name": "100% Atta / Wholegrain",
+      "aliases": ["100% atta", "100% whole wheat", "100% wholewheat", "100% whole grain", "100% wholegrain"],
+      "type": "ingredient_sensitive",
+      "nutrient": null,
+      "hard_deny_list": ["maida", "refined wheat flour", "refined flour"],
+      "soft_deny_list": ["caramel", "colour", "color"],
+      "rule_id": "FSSAI-2.2.7-WG",
+      "pass_text": "A 100% wholewheat claim is consistent with the ingredients list.",
+      "fail_text": "A 100% wholewheat claim is contradicted by refined flour (maida) in the ingredients."
+    }
+  ],
+
+  "prohibited_terms": {
+    "rule_id": "FSSAI-ADE-5",
+    "action": "hard_flag",
+    "keywords": [
+      "prevent", "treat", "cure", "heal",
+      "anti-cancer", "anticancer", "anti diabetic", "anti-diabetic", "diabetic friendly",
+      "boosts immunity", "supports immunity", "immunity booster",
+      "100% pure", "100% natural", "100% organic",
+      "clinically proven", "doctor recommended"
+    ],
+    "message": "Claim uses a term that is prohibited or high-risk under FSSAI advertising & claims regulations unless specifically approved."
+  },
+
+  "mandatory_checks": {
+    "nutrition_panel_present": true,
+    "ingredients_list_present": true,
+    "veg_nonveg_symbol": true,
+    "fssai_license_visible": true,
+    "note": "Phase-1 records these as informational warnings only; they are not hard blocks."
+  }
+}

@@ -1,0 +1,13 @@
+streamlit>=1.40
+pandas>=2.0
+groq>=0.11
+pillow>=10.0
+numpy>=1.26
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+# OCR (Python 3.12 or older: PaddlePaddle has no wheels for 3.13+)
+paddlepaddle==3.2.0
+paddleocr>=3.0
+# Lighter OCR fallback using the same PP-OCR models on ONNX Runtime
+rapidocr_onnxruntime>=1.3

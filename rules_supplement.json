@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "description": "Project-team supplements to fssai_phase1_rules.json. Kept separate so the official extraction stays untouched. Every entry here is a transparent engineering addition, not an FSSAI quotation.",
+    "version": "2026-11-phase1-supplement"
+  },
+
+  "extra_hard_deny": {
+    "no_added_sugar": ["sugar", "glucose", "invert sugar syrup", "sugar syrup"],
+    "note": "Plain 'sugar' and 'glucose' are the most common added sugars but are missing from the base hard_deny_list."
+  },
+
+  "vague_terms": {
+    "rule_id": "URE-VAGUE-1",
+    "keywords": [
+      "healthy", "heart healthy", "wholesome", "goodness", "diet", "lite", "light",
+      "smart snacking", "fitness", "wellness", "pro heart", "naturally sweetened",
+      "clean snack", "meal replacement", "power packed"
+    ],
+    "message": "This is a vague health/diet descriptor. FSSAI Phase-1 rules give it no measurable threshold, so it cannot be verified from the label and may create a misleading impression.",
+    "source": "PROJECT.md section 7 lists 'Healthy' among high-risk terms; the remaining words come from front-of-pack claims in fmcg_label_audit_dataset.csv."
+  },
+
+  "implied_rules": {
+    "rule_id": "URE-IMPLIED-1",
+    "map": {
+      "diet": "low_fat",
+      "lite": "low_fat",
+      "light": "low_fat",
+      "naturally sweetened": "no_added_sugar"
+    },
+    "source": "fmcg_label_audit_dataset.csv row 23 compliance_clause: \"Using the term 'Diet' or 'Lite' requires meeting statutory low-fat criteria under FSSAI Advertising regulations.\" 'Naturally sweetened' is treated as a no-added-sugar promise (row 4)."
+  },
+
+  "liquid_category_hints": ["beverage", "drink", "juice", "water", "lassi", "milk"],
+  "solid_override_hints": ["premix", "powder", "mix"]
+}
