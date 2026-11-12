@@ -79,11 +79,12 @@ The Vercel deployment at `https://nutrition-claim-verifier-ui.vercel.app` is cur
 1. In [Render Dashboard](https://dashboard.render.com), click **New +** -> **Web Service**.
 2. Connect your repository: `bodasrisaiganeshan/nutrition-claim-verifier`.
 3. Set:
-   - **Environment**: `Python 3`
+   - **Environment / Runtime**: `Python 3`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
-4. Under **Environment Variables**, add:
-   - `GROQ_API_KEY`: *(your real Groq key)*
+4. Under **Environment Variables**, configure:
+   - `PYTHON_VERSION`: `3.12.8` *(enforced via committed `.python-version` and `render.yaml`; also recommended to set explicitly in Render dashboard)*
+   - `GROQ_API_KEY`: *(paste your real Groq key from `.streamlit/secrets.toml`)*
    - `GROQ_MODEL`: `openai/gpt-oss-120b`
 5. Click **Create Web Service**. Your public URL will be:
    `https://nutrition-claim-verifier-api.onrender.com`
